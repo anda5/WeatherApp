@@ -17,6 +17,7 @@ public class Util {
 
     private static final String URL = "api.openweathermap.org/data/2.5/weather?q=";
     private static final String HEADER = "x-api-key";
+    private static final String ICON = "api.openweathermap.org/img/w/";
 
     private static String getApiKey(Context context){
         String result = null;
