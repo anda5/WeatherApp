@@ -2,9 +2,17 @@ package Utils;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.net.ConnectivityManager;
 import android.util.Log;
 
 import com.anda.weatherapp.R;
+
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -20,11 +28,11 @@ import java.net.URL;
  */
 public class Util {
 
-    private static final String _URL = "api.openweathermap.org/data/2.5/weather?q=";
+    private static final String _URL = "http://api.openweathermap.org/data/2.5/weather?q=Galati,ro&appid=";
     private static final String _HEADER = "x-api-key";
     private static final String _ICON = "api.openweathermap.org/img/w/";
 
-    private static String getApiKey(Context context){
+    private static String getApiKey(Context context) {
         String result = null;
         try {
             Resources res = context.getResources();
@@ -33,38 +41,43 @@ public class Util {
             inputStream.read(b);
             result = new String(b);
         } catch (Exception e) {
-            Log.v("Error","Can't open the file");
+            Log.v("Error", "Can't open the file");
         }
-      return result;
+        return result;
     }
 
-    public static String getJSONObject(Context context, String location){
-        HttpURLConnection connection = null;
-        InputStream inputStream = null;
+    public static String getJSONObject(Context context, String location) {
 
-        try {
-            connection = (HttpURLConnection)(new URL(_URL+location)).openConnection();
-            connection.setRequestMethod("GET");
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
-            connection.connect();
+        String responseString = null;
+        if (((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo() != null) {
+            try {
+                // Get a HTTP client
+                DefaultHttpClient client = new DefaultHttpClient();
+                HttpEntity entity = null;
+                HttpResponse response = null;
 
-            StringBuffer stringBuffer = new StringBuffer();
-            inputStream = connection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            String line = null;
-            while((line=bufferedReader.readLine())!=null){
-             stringBuffer.append(line+"\r\n");
+                // Create and execute a new GET HTTP request
+                HttpGet httpGet = new HttpGet(_URL);
+                // Add API Key in header
+                httpGet.addHeader("x-api-key", "4622fe72e39039fa958f8398e55a3c70");
+                response = client.execute(httpGet);
+
+                // Get response from server
+                entity = response.getEntity();
+                responseString = EntityUtils.toString(entity);
+
+            } catch (Exception e) {
+                // Log exception and print stack trace
+                Log.d("HTTP", e.getMessage().toString());
+
+
             }
-            inputStream.close();
-            connection.disconnect();
 
-            return stringBuffer.toString();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            return  null;
+            // Return response string
         }
 
+        return responseString;
     }
-}
+    }
+
+
