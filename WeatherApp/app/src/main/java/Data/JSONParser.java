@@ -19,6 +19,7 @@ public class JSONParser {
         try {
             JSONObject jsonObject = new JSONObject(jsonString);
             Place place = new Place();
+
             JSONObject coordonetes = jsonObject.getJSONObject("coord");
             JSONObject sys = jsonObject.getJSONObject("sys");
             JSONArray jsonArray = jsonObject.getJSONArray("weather");
@@ -33,9 +34,12 @@ public class JSONParser {
             place.set_sunrise(sys.getLong("sunrise"));
             place.set_sunset(sys.getLong("sunset"));
             place.set_city(jsonObject.getString("name"));
+
             weather._place = place;
             weather._condition.set_id(weatherObj.getInt("id"));
-            weather._condition.set_condition(weatherObj.getString("main"));
+            weather._condition.set_temperature(Double.valueOf(jsonObject.getJSONObject("main").getString("temp")));
+            weather._condition.set_pressure(Float.valueOf(jsonObject.getJSONObject("main").getString("pressure")));
+            weather._condition.set_humidity(Float.valueOf(jsonObject.getJSONObject("main").getString("humidity")));
             weather._condition.set_description(weatherObj.getString("description"));
             weather._condition.set_icon(weatherObj.getString("icon"));
             weather._cloud.set_precipitation(cloud.getInt("all"));
